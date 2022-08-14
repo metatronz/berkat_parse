@@ -44,6 +44,7 @@ var sitelink string
 var filter string
 var processPhotos bool
 var pagesCount int
+var rate int
 
 func init() {
 
@@ -55,6 +56,7 @@ func main() {
 	flag.StringVar(&filter, "filter", "", "filter for categories")
 	flag.BoolVar(&processPhotos, "photo", false, "process photos")
 	flag.IntVar(&pagesCount, "pages", 5, "number of pages")
+	flag.IntVar(&rate, "rate", 200, "rate limiter milliseconds")
 	flag.Parse()
 
 	fmt.Println(`Usage: -photo  if you need photos ,
@@ -62,6 +64,7 @@ func main() {
 		filter=some filter ,
 		pages=5`)
 
+	flag.PrintDefaults()
 	if processPhotos {
 		err := os.Mkdir("photos", 0755)
 		if err != nil {
@@ -84,7 +87,7 @@ func main() {
 		fmt.Println(sig)
 	}()
 
-	limiter := time.Tick(time.Millisecond * 500)
+	limiter := time.Tick(time.Millisecond * time.Duration(rate))
 	go func(ctx context.Context) {
 		for i := 0; i < pagesCount; i++ {
 			select {
